@@ -30,7 +30,7 @@ case class Quote(
   circulating_supply: BigDecimal,
   total_supply: BigDecimal,
   market_cap_by_total_supply: Option[BigDecimal],
-  max_supply: BigDecimal,
+  max_supply: Option[BigDecimal],
   date_added: String,
   tags: List[String],
   last_updated: String,

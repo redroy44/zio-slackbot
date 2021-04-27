@@ -7,6 +7,7 @@ import zio._
 import zio.logging._
 import zio.config._
 import zio.magic._
+import zio.stream._
 import slackbot.config.Config
 import slackbot.client.CoinMarketCapClient
 import sttp.client3.httpclient.zio._
@@ -48,12 +49,14 @@ object WebSocketZio extends App {
     _ <- log.info("Hello from ZIO logger")
     c <- getConfig[Config]
     _ <- log.info(s" apiKey: ${c.cmcApiKey}")
-    r <- CoinMarketCapClient.getCryptoMap //.catchAll(e => log.error(e.getMessage()))
+    r <- CoinMarketCapClient.getCryptoMap
     _ <- log.info(s"${r.status}")
-    symbol = "BTC"
-    _ <- log.info(s"${r.data.find(_.symbol == symbol)}")
-    q <- CoinMarketCapClient.getCryptoQuote(r.data.find(_.symbol == symbol).map(_.id).get)
-    _ <- log.info(s"${q.data}")
+    symbol = "CHSB"
+    id <- ZIO
+      .fromOption(r.data.find(_.symbol == symbol).map(_.id))
+      .mapError(_ => new RuntimeException("Specified crypto not found!"))
+    q <- CoinMarketCapClient.getCryptoQuote(id)
+    _ <- log.info(s"${q.data.values.head.quote("USD")}")
   } yield ()
 
 }

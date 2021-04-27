@@ -49,6 +49,9 @@ case class CoinMarketCapClientLive(apiKey: String, cmcEndpoint: String) extends 
       _   <- log.debug(request.toCurl)
       res <- send(request)
     } yield (res.body)).absolve
+  // .catchSome { case HttpError(body: ErrorResponse, _) =>
+  //   ZIO.succeed(IdMapResponse(List.empty, body.status))
+  // }
 
   def getCryptoQuote(id: Int): RIO[SttpClient with Logging, QuoteResponse] =
     (for {
@@ -67,6 +70,8 @@ case class CoinMarketCapClientLive(apiKey: String, cmcEndpoint: String) extends 
       _   <- log.debug(request.toCurl)
       res <- send(request)
     } yield (res.body)).absolve
+
+    
 
   // def processResponse(
   //   response: Either[ResponseException[ResponseError, Error], CmcResponse]
