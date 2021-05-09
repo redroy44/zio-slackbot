@@ -43,7 +43,6 @@ lazy val root = project
       "io.github.jmcardon"            %% "tsec-mac"               % tsecVersion,
       "dev.zio"                       %% "zio-test"               % zioVersion % Test,
       "dev.zio"                       %% "zio-test-sbt"           % zioVersion % Test,
-      "dev.zio"                       %% "zio-test-junit"         % zioVersion % Test,
       "dev.zio"                       %% "zio-test-magnolia"      % zioVersion % Test
     ),
     testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))

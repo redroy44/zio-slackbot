@@ -1,10 +1,9 @@
 package slackbot
 
-import zio.test.Assertion.equalTo
-import zio.test.junit.JUnitRunnableSpec
-import zio.test.{ assert, suite, test }
+import zio.test._
+import zio.test.Assertion._
 
-object MainSpec extends JUnitRunnableSpec {
+object MainSpec extends DefaultRunnableSpec {
 
   def spec = suite("Test environment")(
     test("expect call with input satisfying assertion") {
