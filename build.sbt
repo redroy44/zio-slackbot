@@ -5,6 +5,8 @@ val zioConfigVersion  = "1.0.4"
 val zioLoggingVersion = "0.5.8"
 val sttpVersion       = "3.3.0-RC5"
 val circeVersion      = "0.13.0"
+val zhttpVersion      = "1.0.0.0-RC15"
+val tsecVersion       = "0.2.1"
 
 lazy val root = project
   .in(file("."))
@@ -36,6 +38,9 @@ lazy val root = project
       "com.softwaremill.sttp.client3" %% "httpclient-backend-zio" % sttpVersion,
       "io.circe"                      %% "circe-generic"          % circeVersion,
       "io.circe"                      %% "circe-generic-extras"   % circeVersion,
+      "io.d11"                        %% "zhttp"                  % zhttpVersion,
+      "io.github.jmcardon"            %% "tsec-common"            % tsecVersion,
+      "io.github.jmcardon"            %% "tsec-mac"               % tsecVersion,
       "dev.zio"                       %% "zio-test"               % zioVersion % Test,
       "dev.zio"                       %% "zio-test-sbt"           % zioVersion % Test,
       "dev.zio"                       %% "zio-test-junit"         % zioVersion % Test,

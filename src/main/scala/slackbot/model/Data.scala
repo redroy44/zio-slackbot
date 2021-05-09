@@ -2,6 +2,8 @@ package slackbot.model
 
 import io.circe._, io.circe.generic.semiauto._
 
+import slackbot.utils.BigDecimalOps._
+
 sealed trait Data
 
 case class IdMap(
@@ -35,10 +37,14 @@ case class Quote(
   tags: List[String],
   last_updated: String,
   quote: Map[String, QuoteInternal]
-) extends Data
+) extends Data {
+  override def toString: String =
+    s"$symbol - price: ${quote("USD").price.pretty} USD 24h change: ${quote("USD").percent_change_24h.pretty}%"
+}
 
 object Quote {
   implicit val decoder: Decoder[Quote] = deriveDecoder[Quote]
+  implicit val encoder: Encoder[Quote] = deriveEncoder[Quote]
 }
 
 case class QuoteInternal(
@@ -59,4 +65,5 @@ case class QuoteInternal(
 
 object QuoteInternal {
   implicit val decoder: Decoder[QuoteInternal] = deriveDecoder[QuoteInternal]
+  implicit val encoder: Encoder[QuoteInternal] = deriveEncoder[QuoteInternal]
 }

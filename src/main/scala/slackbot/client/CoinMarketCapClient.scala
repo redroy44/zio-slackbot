@@ -8,8 +8,6 @@ import sttp.client3.circe._
 import sttp.client3.httpclient.zio._
 import sttp.model._
 
-//import io.circe.generic.auto._
-
 import slackbot.model._
 import slackbot.model.CmcResponse._
 import slackbot.config.Config
@@ -70,8 +68,6 @@ case class CoinMarketCapClientLive(apiKey: String, cmcEndpoint: String) extends 
       _   <- log.debug(request.toCurl)
       res <- send(request)
     } yield (res.body)).absolve
-
-    
 
   // def processResponse(
   //   response: Either[ResponseException[ResponseError, Error], CmcResponse]
