@@ -10,6 +10,7 @@ val tsecVersion       = "0.2.1"
 
 lazy val root = project
   .in(file("."))
+  .enablePlugins(JavaAppPackaging)
   .settings(
     name := "zio-slackbot",
     organization := "com.dataspark",

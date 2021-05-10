@@ -67,7 +67,13 @@ object CryptoSlackBot extends App {
     r.getBodyAsString
       .map(URLDecoder.decode(_, "UTF-8"))
       .map(
-        _.split("&").foldLeft(Map[String, String]())((m, kv) => m + (kv.split("=")(0) -> kv.split("=")(1)))
+        _.split("&").foldLeft(Map[String, String]())((m, kv) =>
+          m + (kv.split("=").toList match {
+            case k :: v :: Nil => (k -> v)
+            case k :: Nil      => (k -> "")
+            case _             => throw new RuntimeException("ERROR")
+          })
+        )
       )
       .getOrElse(Map[String, String]())
 
