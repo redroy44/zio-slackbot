@@ -97,7 +97,7 @@ object CryptoSlackBot extends App {
       _ <- log.info(s" apiKey: ${c.cmcApiKey} httpPort: ${c.port}")
       _ <- CoinMarketCapClient.initialize.fork
       _ <- CommandProcessor.processCommands.fork
-      _ <- Server.start(c.port, app).fork
-    } yield ()) *> ZIO.never
+      _ <- Server.start(c.port, app).unit
+    } yield ())
 
 }
