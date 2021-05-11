@@ -94,8 +94,8 @@ object CryptoSlackBot extends App {
     (for {
       _ <- log.info("Hello from ZIO slackbot")
       c <- getConfig[Config]
-      _ <- log.info(s" apiKey: ${c.cmcApiKey} httpPort: ${c.port}")
-      _ <- CoinMarketCapClient.initialize.fork
+      _ <- log.info(s"httpPort: ${c.port} cryptoRefreshPeriod: ${c.cryptoRefreshPeriod}")
+      _ <- CoinMarketCapClient.initialize(c.cryptoRefreshPeriod).fork
       _ <- CommandProcessor.processCommands.fork
       _ <- Server.start(c.port, app).unit
     } yield ())

@@ -20,7 +20,7 @@ trait CoinMarketCapClient {
 
   def getCryptoQuote(id: Int): RIO[SttpClient with Logging, QuoteResponse]
 
-  def initialize: RIO[SttpClient with Logging with Clock, Unit]
+  def initialize(cryptoRefreshPeriod: Duration): RIO[SttpClient with Logging with Clock, Unit]
 
   def cryptoMap: Ref[Map[String, IdMap]]
 }
@@ -34,8 +34,12 @@ object CoinMarketCapClient {
   def getCryptoQuote(id: Int): RIO[Has[CoinMarketCapClient] with SttpClient with Logging, QuoteResponse] =
     ZIO.accessM[Has[CoinMarketCapClient] with SttpClient with Logging](_.get.getCryptoQuote(id))
 
-  def initialize: RIO[Has[CoinMarketCapClient] with SttpClient with Logging with Clock, Unit] =
-    ZIO.accessM[Has[CoinMarketCapClient] with Logging with Clock with SttpClient](_.get.initialize)
+  def initialize(
+    cryptoRefreshPeriod: Duration
+  ): RIO[Has[CoinMarketCapClient] with SttpClient with Logging with Clock, Unit] =
+    ZIO.accessM[Has[CoinMarketCapClient] with Logging with Clock with SttpClient](
+      _.get.initialize(cryptoRefreshPeriod)
+    )
 
   def cryptoMap: URIO[Has[CoinMarketCapClient], Map[String, IdMap]] =
     ZIO.accessM[Has[CoinMarketCapClient]](_.get.cryptoMap.get)
@@ -78,9 +82,9 @@ case class CoinMarketCapClientLive(apiKey: String, cmcEndpoint: String, cryptoMa
       res <- send(request)
     } yield (res.body)).absolve
 
-  def initialize: RIO[SttpClient with Logging with Clock, Unit] =
+  def initialize(cryptoRefreshPeriod: Duration): RIO[SttpClient with Logging with Clock, Unit] =
     Stream
-      .fromSchedule(Schedule.once andThen Schedule.fixed(60.seconds))
+      .fromSchedule(Schedule.once andThen Schedule.fixed(cryptoRefreshPeriod))
       .tap { i =>
         for {
           _           <- log.debug(s"Updating CryptoMap - tick: $i")
