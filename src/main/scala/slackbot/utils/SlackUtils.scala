@@ -7,9 +7,9 @@ import java.time.Instant
 
 object SlackUtils {
   def validateRequest[R](
-    request: Request
+    request: Request,
+    secret: String
   )(f: Request => URIO[R, UResponse]): URIO[R, UResponse] = {
-    val secret = "3f3368dfbb5b08b42e5d9c251099a3d7"
 
     val ts = request.headers.find(_.name == "X-Slack-Request-Timestamp").get
 
