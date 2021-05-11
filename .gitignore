@@ -15,3 +15,5 @@ bin/
 project/
 target/
 build/
+
+application.conf
