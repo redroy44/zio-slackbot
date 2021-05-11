@@ -40,10 +40,12 @@ object CryptoSlackBot extends App {
       format = LogFormat.ColoredLogFormat()
     ) >>> Logging.withRootLoggerName("ZIO demo")
 
-  private def app(secret: String): Http[Console with Logging with Has[CoinMarketCapClient] with SttpClient with Clock with Has[
+  private def app(
+    secret: String
+  ): HttpApp[Console with Logging with Has[CoinMarketCapClient] with SttpClient with Clock with Has[
     CommandProcessor
   ], Throwable] =
-    Http.collectM {
+    HttpApp.collectM {
       case req @ Method.POST -> Root / "slack" / "echo" =>
         SlackUtils.validateRequest(req, secret)(handleRequest)
 

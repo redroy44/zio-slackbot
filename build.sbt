@@ -5,7 +5,7 @@ val zioConfigVersion  = "1.0.4"
 val zioLoggingVersion = "0.5.8"
 val sttpVersion       = "3.3.0-RC5"
 val circeVersion      = "0.13.0"
-val zhttpVersion      = "1.0.0.0-RC15"
+val zhttpVersion      = "1.0.0.0-RC16"
 val tsecVersion       = "0.2.1"
 
 lazy val root = project

@@ -87,7 +87,6 @@ case class CoinMarketCapClientLive(apiKey: String, cmcEndpoint: String, cryptoMa
       .fromSchedule(Schedule.once andThen Schedule.fixed(cryptoRefreshPeriod))
       .tap { i =>
         for {
-          _           <- log.debug(s"Updating CryptoMap - tick: $i")
           mapResponse <- getCryptoMap
           _ <- cryptoMap.set(
             mapResponse.data.foldLeft(Map[String, IdMap]())((map, elem) => map + (elem.symbol -> elem))
