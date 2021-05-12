@@ -1,31 +1,27 @@
 package slackbot.utils
 
 import zhttp.http._
-import zio._
+// import zio._
 
 import java.time.Instant
 
 object SlackUtils {
-  def validateRequest[R](
-    request: Request,
+  def validated[R, E](
     secret: String
-  )(f: Request => URIO[R, UResponse]): URIO[R, UResponse] = {
-
-    val ts = request.headers.find(_.name == "X-Slack-Request-Timestamp").get
-
-    val slackSignature = request.headers.find(_.name == "X-Slack-Signature").get.value.toString
-    val request_body   = request.getBodyAsString.getOrElse("")
-    val mySignature    = "v0:" + ts.value.toString() + ":" + request_body
-    val signed         = "v0=" + HMACgen.generateHMAC(secret, mySignature)
-
-    if (
-      slackSignature
-        .equals(signed) && (math.abs(Instant.now.toEpochMilli - (ts.value.toString().toLong) * 1000) < 60 * 5 * 1000)
-    )
-      f(request)
-    else
-      UIO(HttpError.Unauthorized("Request verification failed").toResponse)
-  }
+  )(fail: HttpApp[R, E], success: HttpApp[R, E]): HttpApp[R, E] =
+    Http.flatten {
+      Http.fromFunction[Request] { req =>
+        (for {
+          slackTimestamp <- req.getHeaderValue("X-Slack-Request-Timestamp")
+          slackSignature <- req.getHeaderValue("X-Slack-Signature")
+          reqBody        <- req.getBodyAsString
+          signature = "v0:" + slackTimestamp + ":" + reqBody
+          signed    = "v0=" + HMACgen.generateHMAC(secret, signature)
+          if (slackSignature
+            .equals(signed) && (math.abs(Instant.now.toEpochMilli - (slackTimestamp.toLong) * 1000) < 60 * 5 * 1000))
+        } yield ()).fold(fail)(_ => success)
+      }
+    }
 }
 
 import javax.crypto.Mac

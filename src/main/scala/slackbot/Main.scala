@@ -16,7 +16,7 @@ import zhttp.service._
 
 import java.net.URLDecoder
 
-import slackbot.utils.SlackUtils
+import slackbot.utils.SlackUtils.validated
 import slackbot.service.CommandProcessor
 import slackbot.model._
 
@@ -40,29 +40,25 @@ object CryptoSlackBot extends App {
       format = LogFormat.ColoredLogFormat()
     ) >>> Logging.withRootLoggerName("ZIO demo")
 
-  private def app(
-    secret: String
-  ): HttpApp[Console with Logging with Has[CoinMarketCapClient] with SttpClient with Clock with Has[
+  private def slack: HttpApp[Console with Logging with Has[CoinMarketCapClient] with SttpClient with Clock with Has[
     CommandProcessor
   ], Throwable] =
     HttpApp.collectM {
       case req @ Method.POST -> Root / "slack" / "echo" =>
-        SlackUtils.validateRequest(req, secret)(handleRequest)
+        handleRequest(req)
 
       case req @ Method.POST -> Root / "slack" / "check" =>
-        SlackUtils.validateRequest(req, secret) { r =>
-          for {
-            _ <- log.info(s"received request on ${r.endpoint}")
-            form = extractFormData(r)
-            _ <- log.info(form.toString())
-            _ <- CommandProcessor.enqueueCommand(
-              CheckCommand(
-                args = form("text"),
-                responseUrl = Uri.parse(form("response_url")).getOrElse(Uri("example.com"))
-              )
+        for {
+          _ <- log.info(s"received request on ${req.endpoint}")
+          form = extractFormData(req)
+          _ <- log.info(form.toString())
+          _ <- CommandProcessor.enqueueCommand(
+            CheckCommand(
+              args = form("text"),
+              responseUrl = Uri.parse(form("response_url")).getOrElse(Uri("example.com"))
             )
-          } yield Response.ok
-        }
+          )
+        } yield Response.ok
     }
 
   private def extractFormData(r: Request): Map[String, String] =
@@ -90,11 +86,15 @@ object CryptoSlackBot extends App {
       )
     } yield Response.ok
 
+  def test: UHttpApp = Http.collect { case Method.GET -> Root / "test" => Response.text("Hello from CryptoBot!") }
+
+  def app(secret: String) = test +++ validated(secret)(HttpApp.forbidden("Not allowed!"), slack)
+
   private val program: RIO[Logging with Has[Config] with Has[
     CoinMarketCapClient
   ] with SttpClient with Clock with Console with Has[CommandProcessor], Unit] =
     (for {
-      _ <- log.info("Hello from ZIO slackbot")
+      _ <- log.info("Hello from ZIO CryptoBot!")
       c <- getConfig[Config]
       _ <- log.info(s"httpPort: ${c.port} cryptoRefreshPeriod: ${c.cryptoRefreshPeriod}")
       _ <- CoinMarketCapClient.initialize(c.cryptoRefreshPeriod).fork
