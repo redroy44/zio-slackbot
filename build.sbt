@@ -3,11 +3,9 @@ val scala2Version = "2.13.5"
 val zioVersion        = "1.0.7"
 val zioConfigVersion  = "1.0.4"
 val zioLoggingVersion = "0.5.8"
-val zioCryptoVersion  = "0.0.0+26-a09930a5-SNAPSHOT"
 val sttpVersion       = "3.3.0-RC5"
 val circeVersion      = "0.13.0"
 val zhttpVersion      = "1.0.0.0-RC16"
-val tsecVersion       = "0.2.1"
 
 lazy val root = project
   .in(file("."))
@@ -17,7 +15,6 @@ lazy val root = project
     organization := "com.dataspark",
     version := "0.0.1",
     scalaVersion := scala2Version,
-    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full),
     resolvers ++= Seq(
       "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
       "Sonatype OSS Snapshots s01" at "https://s01.oss.sonatype.org/content/repositories/snapshots"
@@ -38,7 +35,6 @@ lazy val root = project
       "dev.zio"                       %% "zio-config"             % zioConfigVersion,
       "dev.zio"                       %% "zio-config-magnolia"    % zioConfigVersion,
       "dev.zio"                       %% "zio-logging"            % zioLoggingVersion,
-      "dev.zio"                       %% "zio-crypto"             % zioCryptoVersion,
       "io.github.kitlangton"          %% "zio-magic"              % "0.2.3",
       "com.softwaremill.sttp.client3" %% "core"                   % sttpVersion,
       "com.softwaremill.sttp.client3" %% "circe"                  % sttpVersion,
@@ -46,8 +42,6 @@ lazy val root = project
       "io.circe"                      %% "circe-generic"          % circeVersion,
       "io.circe"                      %% "circe-generic-extras"   % circeVersion,
       "io.d11"                        %% "zhttp"                  % zhttpVersion,
-      "io.github.jmcardon"            %% "tsec-common"            % tsecVersion,
-      "io.github.jmcardon"            %% "tsec-mac"               % tsecVersion,
       "dev.zio"                       %% "zio-test"               % zioVersion % Test,
       "dev.zio"                       %% "zio-test-sbt"           % zioVersion % Test,
       "dev.zio"                       %% "zio-test-magnolia"      % zioVersion % Test
