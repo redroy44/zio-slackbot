@@ -27,7 +27,7 @@ lazy val root = project
       "utf8", // Option and arguments on same line
       // "-Xfatal-warnings", // New lines for each options
       "-deprecation",
-      // "-unchecked",
+      "-unchecked",
       "-language:implicitConversions",
       "-language:higherKinds",
       "-language:existentials",

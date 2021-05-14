@@ -98,8 +98,8 @@ object CryptoSlackBot extends App {
       _ <- log.info("Hello from ZIO CryptoBot!")
       c <- getConfig[Config]
       _ <- log.info(s"httpPort: ${c.port} cryptoRefreshPeriod: ${c.cryptoRefreshPeriod}")
-      _ <- CoinMarketCapClient.initialize(c.cryptoRefreshPeriod).fork
-      _ <- CommandProcessor.processCommands.fork
+      _ <- CoinMarketCapClient.initialize(c.cryptoRefreshPeriod).forkDaemon
+      _ <- CommandProcessor.processCommands.forkDaemon
       _ <- Server.start(c.port, app(c.slackSigningSecret)).unit
     } yield ())
 

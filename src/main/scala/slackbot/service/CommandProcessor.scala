@@ -20,8 +20,7 @@ object CommandProcessor {
   def enqueueCommand(cmd: SlackCommand): URIO[Has[CommandProcessor], Unit] =
     ZIO.accessM[Has[CommandProcessor]](_.get.enqueueCommand(cmd))
 
-  def processCommands
-    : RIO[Has[CommandProcessor] with Logging with SttpClient with Has[CoinMarketCapClient], Unit] =
+  def processCommands: RIO[Has[CommandProcessor] with Logging with SttpClient with Has[CoinMarketCapClient], Unit] =
     ZIO.accessM[Has[CommandProcessor] with Logging with SttpClient with Has[CoinMarketCapClient]](
       _.get.processCommands
     )
@@ -32,7 +31,12 @@ case class CommandProcessorLive(queue: Queue[SlackCommand]) extends CommandProce
   def enqueueCommand(cmd: SlackCommand): UIO[Unit] = queue.offer(cmd).unit
 
   def processCommands: RIO[Logging with SttpClient with Has[CoinMarketCapClient], Unit] =
-    Stream.fromQueue(queue).tap(c => c.process).runDrain
+    Stream
+      .fromQueue(queue)
+      .tap { c =>
+        SlackCommand.process(c)
+      }
+      .runDrain
 }
 
 object CommandProcessorLive {
