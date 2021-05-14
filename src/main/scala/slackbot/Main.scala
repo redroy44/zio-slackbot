@@ -10,7 +10,7 @@ import slackbot.config.Config
 import slackbot.client.CoinMarketCapClient
 import sttp.client3.httpclient.zio._
 import sttp.model.Uri
-
+import zio.crypto.mac._
 import zhttp.http._
 import zhttp.service._
 
@@ -30,7 +30,8 @@ object CryptoSlackBot extends App {
         CoinMarketCapClient.live,
         HttpClientZioBackend.layer(),
         Clock.live,
-        CommandProcessor.live
+        CommandProcessor.live,
+        HMAC.live
       )
       .exitCode
 
@@ -92,7 +93,7 @@ object CryptoSlackBot extends App {
 
   private val program: RIO[Logging with Has[Config] with Has[
     CoinMarketCapClient
-  ] with SttpClient with Clock with Console with Has[CommandProcessor], Unit] =
+  ] with SttpClient with Clock with Console with Has[CommandProcessor] with HMAC.HMAC, Unit] =
     (for {
       _ <- log.info("Hello from ZIO CryptoBot!")
       c <- getConfig[Config]

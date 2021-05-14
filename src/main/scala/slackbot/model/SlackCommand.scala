@@ -2,7 +2,6 @@ package slackbot.model
 
 import zio._
 import zio.logging._
-import zio.clock._
 import sttp.model.Uri
 import sttp.client3.basicRequest
 import sttp.client3.httpclient.zio._
@@ -13,9 +12,9 @@ sealed trait SlackCommand {
   def name: String
   def args: String
   def responseUrl: Uri
-  def process: RIO[Logging with SttpClient with Clock with Has[CoinMarketCapClient], Unit]
+  def process: RIO[Logging with SttpClient with Has[CoinMarketCapClient], Unit]
 
-  protected def sendResponse(body: String): RIO[Logging with SttpClient, Unit] =
+  protected def sendResponse(body: String): RIO[SttpClient, Unit] =
     send(
       basicRequest
         .post(responseUrl)
@@ -26,7 +25,7 @@ sealed trait SlackCommand {
 
 case class CheckCommand(args: String, responseUrl: Uri) extends SlackCommand {
   override def name: String = "check"
-  override def process: RIO[Logging with SttpClient with Clock with Has[CoinMarketCapClient], Unit] =
+  override def process: RIO[Logging with SttpClient with Has[CoinMarketCapClient], Unit] =
     for {
       _         <- log.debug(s"Processing $name command - args: $args")
       cryptoMap <- CoinMarketCapClient.cryptoMap
@@ -42,12 +41,11 @@ case class CheckCommand(args: String, responseUrl: Uri) extends SlackCommand {
           )
       }
     } yield ()
-
 }
 
 case class EchoCommand(args: String, responseUrl: Uri) extends SlackCommand {
   override val name: String = "echo"
-  override def process: RIO[Logging with SttpClient with Clock with Has[CoinMarketCapClient], Unit] =
+  override def process: RIO[Logging with SttpClient, Unit] =
     for {
       _ <- log.debug(s"Processing $name command - args: $args")
       _ <- sendResponse(s"$name command - $args")
