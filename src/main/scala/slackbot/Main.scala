@@ -4,7 +4,6 @@ import zio._
 import zio.logging._
 import zio.config._
 import zio.clock._
-import zio.console._
 import zio.magic._
 import slackbot.config.Config
 import slackbot.client.CoinMarketCapClient
@@ -40,9 +39,9 @@ object CryptoSlackBot extends App {
 
   def app(secret: String) = test +++ validated(secret)(HttpApp.forbidden("Not allowed!"), Routes.slack)
 
-  private val program: RIO[Logging with Has[Config] with Has[
-    CoinMarketCapClient
-  ] with SttpClient with Clock with Console with Has[CommandProcessor], Unit] =
+  private val program: RIO[Logging with Has[Config] with Has[CoinMarketCapClient] with SttpClient with Clock with Has[
+    CommandProcessor
+  ], Unit] =
     (for {
       _ <- log.info("Hello from ZIO CryptoBot!")
       c <- getConfig[Config]
